@@ -1,6 +1,6 @@
 package it.eureka.katas.birthdaygreeting
 
-fun sendGreetingsToAll(
+fun sendGreetings(
     loadEmployees: (FileName) -> IOEither<ProgramError, List<Employee>>,
     employeeBorneToday: (Employee) -> Boolean,
     sendBirthDayGreetingMail: (Employee) -> IOEither<ProgramError, Unit>

@@ -19,7 +19,7 @@ class BirthdayKataTest {
     private val server = SMTPServer.port(MAIL_SERVER_PORT).messageHandler(sentMessageListener).build()
 
     private val sendGreetingsToAll: (FileName) -> IOEither<ProgramError, Unit> = runBlocking {
-        sendGreetingsToAll(
+        sendGreetings(
             loadEmployees(::readCsv, ::parseEmployee),
             employeeBirthdayFilter(today),
             sendBirthDayGreetingMail(
