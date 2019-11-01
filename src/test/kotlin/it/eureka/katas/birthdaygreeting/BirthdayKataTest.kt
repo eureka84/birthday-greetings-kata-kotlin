@@ -18,7 +18,7 @@ class BirthdayKataTest {
     private val today = LocalDate.of(2019, 9, 11)
     private val server = SMTPServer.port(MAIL_SERVER_PORT).messageHandler(sentMessageListener).build()
 
-    private val sendGreetingsToAll: (FileName) -> Unit = runBlocking {
+    private val sendGreetingsToAll: (FileName) -> IOEither<ProgramError, Unit> = runBlocking {
         sendGreetingsToAll(
             loadEmployees(::readCsv, ::parseEmployee),
             employeeBirthdayFilter(today),
@@ -46,7 +46,7 @@ class BirthdayKataTest {
 
     @Test
     fun `happy path`() {
-        sendGreetingsToAll(FileName("/fixtures/bigFile.csv"))
+        sendGreetingsToAll(FileName("/fixtures/bigFile.csv")).run()
         assertThat(sentMessageListener.recipients).containsAll(
             "mary.ann@foobar.com",
             "caty.ann@foobar.com",
@@ -60,7 +60,7 @@ class BirthdayKataTest {
 
     @Test
     fun `csv file with errors`() {
-        sendGreetingsToAll(FileName("/fixtures/wrongFile.csv"))
+        sendGreetingsToAll(FileName("/fixtures/wrongFile.csv")).run()
         assertThat(sentMessageListener.recipients).isEmpty()
     }
 
