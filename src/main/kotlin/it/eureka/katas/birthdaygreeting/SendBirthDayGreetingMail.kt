@@ -12,14 +12,14 @@ import javax.mail.internet.MimeMessage
 
 data class EmailMessage(val to: EmailAddress, val subject: String, val body: String)
 
-fun sendBirthDayGreetingMail(
-    composeMail: (Employee) -> EmailMessage,
-    sendEmail: (EmailMessage) -> IOEither<ProgramError, Unit>
-): (Employee) -> IOEither<ProgramError, Unit> = { employee: Employee ->
-    (composeMail andThen sendEmail)(employee)
-}
+typealias SendBirthdayGreetingMail = (Employee) -> IOEither<ProgramError, Unit>
+typealias ComposeMessage = (Employee) -> EmailMessage
+typealias SendEmail = (EmailMessage) -> IOEither<ProgramError, Unit>
 
-fun composeBirthdayEmailMessage(template: String): (Employee) -> EmailMessage = { e: Employee ->
+fun sendBirthDayGreetingMail(composeMail: ComposeMessage, sendEmail: SendEmail): SendBirthdayGreetingMail =
+     (composeMail andThen sendEmail)
+
+fun composeBirthdayEmailMessage(template: String): ComposeMessage = { e: Employee ->
     EmailMessage(
         to = e.emailAddress,
         subject = "Birthday greetings",
@@ -27,9 +27,7 @@ fun composeBirthdayEmailMessage(template: String): (Employee) -> EmailMessage = 
     )
 }
 
-fun sendEmail(
-    mailServerConfiguration: MailServerConfiguration
-): (EmailMessage) -> IOEither<ProgramError, Unit> = { msg: EmailMessage ->
+fun sendEmail(mailServerConfiguration: MailServerConfiguration): SendEmail = { msg: EmailMessage ->
     runBlocking {
         IOEitherFrom(
             Either.catch {

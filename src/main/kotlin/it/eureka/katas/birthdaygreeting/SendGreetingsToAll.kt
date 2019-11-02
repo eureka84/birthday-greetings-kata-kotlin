@@ -1,13 +1,13 @@
 package it.eureka.katas.birthdaygreeting
 
 fun sendGreetings(
-    loadEmployees: (FileName) -> IOEither<ProgramError, List<Employee>>,
-    employeeBorneToday: (Employee) -> Boolean,
-    sendBirthDayGreetingMail: (Employee) -> IOEither<ProgramError, Unit>
+    loadEmployees: LoadEmployees,
+    employeeBornToday: EmployeePredicate,
+    sendBirthDayGreetingMail: SendBirthdayGreetingMail
 ): (FileName) -> IOEither<ProgramError, Unit> = { sourceFile: FileName ->
     loadEmployees(sourceFile).flatMap { employees ->
         employees
-            .filter(employeeBorneToday)
+            .filter(employeeBornToday)
             .map(sendBirthDayGreetingMail)
             .sequence().map { Unit }
     }

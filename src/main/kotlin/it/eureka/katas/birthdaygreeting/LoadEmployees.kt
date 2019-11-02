@@ -5,15 +5,18 @@ import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-inline fun loadEmployees(
-    crossinline readCsv: (FileName) -> IOEither<ProgramError, CsvFile>,
-    crossinline parseEmployee: (CsvLine) -> IOEither<ProgramError, Employee>
-): (FileName) -> IOEither<ProgramError, List<Employee>> = { sourceFile: FileName ->
-    readCsv(sourceFile)
-        .flatMap { file ->
-            file.rows.map(parseEmployee).sequence()
-        }
-}
+typealias LoadEmployees = (FileName) -> IOEither<ProgramError, List<Employee>>
+typealias ReadCsv = (FileName) -> IOEither<ProgramError, CsvFile>
+typealias ParseEmployee = (CsvLine) -> IOEither<ProgramError, Employee>
+
+inline fun loadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
+    { sourceFile: FileName ->
+        readCsv(sourceFile)
+            .flatMap { file ->
+                file.rows.map(parseEmployee).sequence()
+            }
+    }
+
 
 fun readCsv(file: FileName): IOEither<ProgramError, CsvFile> =
     runBlocking {
