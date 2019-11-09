@@ -10,12 +10,13 @@ import javax.mail.internet.MimeMessage
 
 data class EmailMessage(val to: EmailAddress, val subject: String, val body: String)
 
-fun sendBirthDayGreetingMail(
-    composeMail: (Employee) -> EmailMessage,
-    sendEmail: suspend (EmailMessage) -> Either<ProgramError, Unit>
-): suspend (Employee) -> Either<ProgramError, Unit> = { employee -> sendEmail(composeMail(employee)) }
+typealias SendEmail = suspend (EmailMessage) -> Either<ProgramError, Unit>
+typealias ComposeMessage = (Employee) -> EmailMessage
 
-fun composeBirthdayEmailMessage(template: String): (Employee) -> EmailMessage = { e: Employee ->
+fun sendBirthDayGreetingMail(composeMail: ComposeMessage, sendEmail: SendEmail): SendBirthdayGreetings =
+    { employee -> sendEmail(composeMail(employee)) }
+
+fun createComposeMessageFrom(template: String): ComposeMessage = { e: Employee ->
     EmailMessage(
         to = e.emailAddress,
         subject = "Birthday greetings",
@@ -23,7 +24,7 @@ fun composeBirthdayEmailMessage(template: String): (Employee) -> EmailMessage = 
     )
 }
 
-fun sendEmail(conf: MailServerConfiguration): suspend (EmailMessage) -> Either<ProgramError, Unit> =
+fun createSendEmailFrom(conf: MailServerConfiguration): SendEmail =
     { msg: EmailMessage ->
         Either.catch {
             val message = MimeMessage(conf.toSession())

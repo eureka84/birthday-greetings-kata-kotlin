@@ -8,7 +8,7 @@ import java.time.LocalDate
 class ComposeBirthdayEmailMessageTest {
 
     private val template = "Happy birthday %s!"
-    private val composeMail = composeBirthdayEmailMessage(template)
+    private val composeMail = createComposeMessageFrom(template)
 
     @Test
     fun `build employee birthday message`() {

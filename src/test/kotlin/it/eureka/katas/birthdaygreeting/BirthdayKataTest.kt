@@ -20,12 +20,12 @@ class BirthdayKataTest {
     private val server = SMTPServer.port(MAIL_SERVER_PORT).messageHandler(sentMessageListener).build()
 
     private val sendGreetingsToAll: suspend (FileName) -> Either<ProgramError, Unit> = runBlocking {
-        sendGreetings(
+        createSendGreetingsFunction(
             loadEmployees(::readCsv, ::parseEmployee),
-            employeeBirthdayFilter(today),
+            createEmployeeBirthdayFilterFor(today),
             sendBirthDayGreetingMail(
-                composeBirthdayEmailMessage("Happy birthday %s!"),
-                sendEmail(
+                createComposeMessageFrom("Happy birthday %s!"),
+                createSendEmailFrom(
                     MailServerConfiguration(
                         host = "localhost",
                         port = MAIL_SERVER_PORT

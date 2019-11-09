@@ -17,7 +17,7 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertTrue(employeeBirthdayFilter(today)(employee))
+        assertTrue(createEmployeeBirthdayFilterFor(today)(employee))
     }
 
     @Test
@@ -30,7 +30,7 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertFalse(employeeBirthdayFilter(today)(employee))
+        assertFalse(createEmployeeBirthdayFilterFor(today)(employee))
     }
 
 
@@ -44,7 +44,7 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertTrue(employeeBirthdayFilter(today)(employee))
+        assertTrue(createEmployeeBirthdayFilterFor(today)(employee))
     }
 
     @Test
@@ -57,7 +57,7 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertTrue(employeeBirthdayFilter(today)(employee))
+        assertTrue(createEmployeeBirthdayFilterFor(today)(employee))
     }
 
     @Test
@@ -70,7 +70,7 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertFalse(employeeBirthdayFilter(today)(employee))
+        assertFalse(createEmployeeBirthdayFilterFor(today)(employee))
     }
 
     @Test
@@ -83,7 +83,7 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertFalse(employeeBirthdayFilter(today)(employee))
+        assertFalse(createEmployeeBirthdayFilterFor(today)(employee))
     }
 
 }

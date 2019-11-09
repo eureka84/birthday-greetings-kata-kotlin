@@ -4,11 +4,16 @@ import arrow.core.Either
 import arrow.core.flatMap
 import kotlinx.coroutines.runBlocking
 
-fun sendGreetings(
-    loadEmployees: suspend (FileName) -> Either<ProgramError, List<Employee>>,
-    employeeBornToday: (Employee) -> Boolean,
-    sendBirthDayGreetingMail: suspend (Employee) -> Either<ProgramError, Unit>
-): suspend (FileName) -> Either<ProgramError, Unit> = { sourceFile: FileName ->
+typealias SendGreetings = suspend (FileName) -> Either<ProgramError, Unit>
+typealias LoadEmployees = suspend (FileName) -> Either<ProgramError, List<Employee>>
+typealias EmployeeFilter = (Employee) -> Boolean
+typealias SendBirthdayGreetings = suspend (Employee) -> Either<ProgramError, Unit>
+
+fun createSendGreetingsFunction(
+    loadEmployees: LoadEmployees,
+    employeeBornToday: EmployeeFilter,
+    sendBirthDayGreetingMail: SendBirthdayGreetings
+): SendGreetings = { sourceFile: FileName ->
     loadEmployees(sourceFile).flatMap { employees ->
         employees
             .filter(employeeBornToday)
