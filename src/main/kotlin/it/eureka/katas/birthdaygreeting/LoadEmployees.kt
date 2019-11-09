@@ -1,19 +1,15 @@
 package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
-import arrow.core.extensions.either.applicative.applicative
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.fix
 import arrow.core.flatMap
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-typealias LoadEmployees = suspend (FileName) -> Either<ProgramError, List<Employee>>
-typealias ReadCsv = suspend (FileName) -> Either<ProgramError, CsvFile>
-typealias ParseEmployee = suspend (CsvLine) -> Either<ProgramError, Employee>
-
-inline fun loadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
+inline fun loadEmployees(
+    crossinline readCsv: suspend (FileName) -> Either<ProgramError, CsvFile>,
+    crossinline parseEmployee: suspend (CsvLine) -> Either<ProgramError, Employee>
+): suspend (FileName) -> Either<ProgramError, List<Employee>> =
     { sourceFile: FileName ->
         readCsv(sourceFile)
             .flatMap { file ->

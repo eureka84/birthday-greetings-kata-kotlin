@@ -5,9 +5,9 @@ import arrow.core.flatMap
 import kotlinx.coroutines.runBlocking
 
 fun sendGreetings(
-    loadEmployees: LoadEmployees,
-    employeeBornToday: EmployeePredicate,
-    sendBirthDayGreetingMail: SendBirthdayGreetingMail
+    loadEmployees: suspend (FileName) -> Either<ProgramError, List<Employee>>,
+    employeeBornToday: (Employee) -> Boolean,
+    sendBirthDayGreetingMail: suspend (Employee) -> Either<ProgramError, Unit>
 ): suspend (FileName) -> Either<ProgramError, Unit> = { sourceFile: FileName ->
     loadEmployees(sourceFile).flatMap { employees ->
         employees

@@ -10,16 +10,12 @@ import javax.mail.internet.MimeMessage
 
 data class EmailMessage(val to: EmailAddress, val subject: String, val body: String)
 
-typealias SendBirthdayGreetingMail = suspend (Employee) -> Either<ProgramError, Unit>
-typealias ComposeMessage = (Employee) -> EmailMessage
-typealias SendEmail = suspend (EmailMessage) -> Either<ProgramError, Unit>
-
 fun sendBirthDayGreetingMail(
-    composeMail: ComposeMessage,
-    sendEmail: SendEmail
-): SendBirthdayGreetingMail = { employee -> sendEmail(composeMail(employee)) }
+    composeMail: (Employee) -> EmailMessage,
+    sendEmail: suspend (EmailMessage) -> Either<ProgramError, Unit>
+): suspend (Employee) -> Either<ProgramError, Unit> = { employee -> sendEmail(composeMail(employee)) }
 
-fun composeBirthdayEmailMessage(template: String): ComposeMessage = { e: Employee ->
+fun composeBirthdayEmailMessage(template: String): (Employee) -> EmailMessage = { e: Employee ->
     EmailMessage(
         to = e.emailAddress,
         subject = "Birthday greetings",
@@ -27,19 +23,19 @@ fun composeBirthdayEmailMessage(template: String): ComposeMessage = { e: Employe
     )
 }
 
-suspend fun sendEmail(mailServerConfiguration: MailServerConfiguration): SendEmail = { msg: EmailMessage ->
-    Either.catch {
-        val message = MimeMessage(mailServerConfiguration.toSession())
+fun sendEmail(conf: MailServerConfiguration): suspend (EmailMessage) -> Either<ProgramError, Unit> =
+    { msg: EmailMessage ->
+        Either.catch {
+            val message = MimeMessage(conf.toSession())
 
-        message.setFrom(InternetAddress("no-reply@myservice.com"))
-        message.addRecipient(Message.RecipientType.TO, InternetAddress(msg.to.value))
-        message.subject = msg.subject
-        message.setText(msg.body)
+            message.setFrom(InternetAddress("no-reply@myservice.com"))
+            message.addRecipient(Message.RecipientType.TO, InternetAddress(msg.to.value))
+            message.subject = msg.subject
+            message.setText(msg.body)
 
-        Transport.send(message)
-    }.mapLeft { MailSendingError(msg) as ProgramError }
-
-}
+            Transport.send(message)
+        }.mapLeft { MailSendingError(msg) as ProgramError }
+    }
 
 data class MailServerConfiguration(val host: String, val port: Int) {
     fun toSession(): Session {

@@ -60,7 +60,6 @@ class BirthdayKataTest {
         )
     }
 
-
     @Test
     fun `csv file with errors`() {
         runBlocking {
@@ -68,6 +67,5 @@ class BirthdayKataTest {
         }
         assertThat(sentMessageListener.recipients).isEmpty()
     }
-
 
 }

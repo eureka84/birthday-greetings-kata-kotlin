@@ -4,9 +4,7 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.Month.FEBRUARY
 
-typealias EmployeePredicate = (Employee) -> Boolean
-
-fun employeeBirthdayFilter(today: LocalDate): EmployeePredicate = { e: Employee ->
+fun employeeBirthdayFilter(today: LocalDate): (Employee) -> Boolean = { e: Employee ->
     when {
         e.isBornOn(FEBRUARY, 29) && today.isLeapYear -> today.`is`(FEBRUARY, 29)
         e.isBornOn(FEBRUARY, 29) -> today.`is`(FEBRUARY, 28)
