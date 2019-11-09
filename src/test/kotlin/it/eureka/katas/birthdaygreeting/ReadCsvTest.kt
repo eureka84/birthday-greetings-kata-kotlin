@@ -4,34 +4,36 @@ import arrow.core.left
 import arrow.core.right
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 class ReadCsvTest {
 
     @Test
     fun `non existing file`() {
-        assertThat(readCsv(FileName("/fixtures/a_non_existing_file")))
-            .isEqualTo(IOEitherFrom(ReadFileError("/fixtures/a_non_existing_file").left()))
+        assertThat(
+            runBlocking { readCsv(FileName("/fixtures/a_non_existing_file")) }
+        ).isEqualTo(ReadFileError("/fixtures/a_non_existing_file").left())
     }
 
     @Test
     fun `empty file so empty csv`() {
-        assertThat(readCsv(FileName("/fixtures/emptyFile.csv")))
-            .isEqualTo(IOEitherFrom(CsvFile(listOf()).right()))
+        assertThat(
+            runBlocking { readCsv(FileName("/fixtures/emptyFile.csv")) }
+        ).isEqualTo(CsvFile(listOf()).right())
     }
 
     @Test
     internal fun `filled csv`() {
-        assertThat(readCsv(FileName("/fixtures/goodFile.csv")))
-            .isEqualTo(
-                IOEitherFrom(
-                    CsvFile(
-                        listOf(
-                            CsvLine("Doe, John, 1982/10/08, john.doe@foobar.com"),
-                            CsvLine("Ann, Mary, 1975/09/11, mary.ann@foobar.com")
-                        )
-                    ).right()
+        assertThat(
+            runBlocking { readCsv(FileName("/fixtures/goodFile.csv")) }
+        ).isEqualTo(
+            CsvFile(
+                listOf(
+                    CsvLine("Doe, John, 1982/10/08, john.doe@foobar.com"),
+                    CsvLine("Ann, Mary, 1975/09/11, mary.ann@foobar.com")
                 )
-            )
+            ).right()
+        )
     }
 }
