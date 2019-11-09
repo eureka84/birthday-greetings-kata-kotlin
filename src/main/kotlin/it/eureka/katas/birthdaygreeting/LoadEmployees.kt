@@ -23,9 +23,6 @@ inline fun loadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee
             }
     }
 
-fun <E, A> List<Either<E, A>>.sequence(): Either<E, List<A>> =
-    this.sequence(Either.applicative()).fix().map { it.fix() }
-
 suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
     Either.catch {
         object {}.javaClass.getResource(file.path).readText()
