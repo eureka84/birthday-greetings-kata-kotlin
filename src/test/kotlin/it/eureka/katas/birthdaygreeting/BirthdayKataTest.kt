@@ -1,6 +1,5 @@
 package it.eureka.katas.birthdaygreeting
 
-import arrow.core.Either
 import assertk.assertThat
 import assertk.assertions.containsAll
 import assertk.assertions.isEmpty
@@ -19,21 +18,23 @@ class BirthdayKataTest {
     private val today = LocalDate.of(2019, 9, 11)
     private val server = SMTPServer.port(MAIL_SERVER_PORT).messageHandler(sentMessageListener).build()
 
-    private val sendGreetingsToAll: suspend (FileName) -> Either<ProgramError, Unit> = runBlocking {
-        createSendGreetingsFunction(
-            loadEmployees(::readCsv, ::parseEmployee),
-            createEmployeeBirthdayFilterFor(today),
-            sendBirthDayGreetingMail(
-                composeMessage,
-                createSendEmailFrom(
-                    MailServerConfiguration(
-                        host = "localhost",
-                        port = MAIL_SERVER_PORT
-                    )
-                )
+    private val sendBirthDayGreetingMail = createSendBirthDayGreetingMail(
+        composeMessage,
+        createSendEmailFrom(
+            MailServerConfiguration(
+                host = "localhost",
+                port = MAIL_SERVER_PORT
             )
         )
-    }
+    )
+    private val loadEmployees = loadEmployees(::readCsv, ::parseEmployee)
+    private val employeeBornToday = createEmployeeBirthdayFilterFor(today)
+
+    private val sendGreetingsToAll: SendGreetings = createSendGreetingsFunction(
+        loadEmployees,
+        employeeBornToday,
+        sendBirthDayGreetingMail
+    )
 
     @BeforeEach
     fun setUp() {
