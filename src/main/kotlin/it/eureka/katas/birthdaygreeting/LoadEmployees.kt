@@ -23,7 +23,7 @@ suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
     Either.catch {
         object {}.javaClass.getResource(file.path).readText()
     }.bimap(
-        { ReadFileError(file.path) as ProgramError },
+        { ReadFileError(file.path) },
         { text ->
             text.split("\n")
                 .drop(1)
@@ -42,7 +42,7 @@ suspend fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
                     birthDate = LocalDate.parse(csvLineCols[2], DateTimeFormatter.ofPattern("yyyy/MM/dd")),
                     emailAddress = EmailAddress(csvLineCols[3])
                 )
-            }.mapLeft { ParseError(csvLine.raw) as ProgramError }
+            }.mapLeft { ParseError(csvLine.raw) }
         }
 
 data class FileName(val path: String)

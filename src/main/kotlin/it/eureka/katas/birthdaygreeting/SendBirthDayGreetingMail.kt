@@ -35,7 +35,7 @@ fun createSendEmailFrom(conf: MailServerConfiguration): SendEmail =
             message.setText(msg.body)
 
             Transport.send(message)
-        }.mapLeft { MailSendingError(msg) as ProgramError }
+        }.mapLeft { MailSendingError(msg) }
     }
 
 data class MailServerConfiguration(val host: String, val port: Int) {
