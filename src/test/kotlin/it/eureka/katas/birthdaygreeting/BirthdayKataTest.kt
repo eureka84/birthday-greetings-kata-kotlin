@@ -24,7 +24,7 @@ class BirthdayKataTest {
             loadEmployees(::readCsv, ::parseEmployee),
             createEmployeeBirthdayFilterFor(today),
             sendBirthDayGreetingMail(
-                createComposeMessageFrom("Happy birthday %s!"),
+                composeMessage,
                 createSendEmailFrom(
                     MailServerConfiguration(
                         host = "localhost",

@@ -16,11 +16,11 @@ typealias ComposeMessage = (Employee) -> EmailMessage
 fun sendBirthDayGreetingMail(composeMail: ComposeMessage, sendEmail: SendEmail): SendBirthdayGreetings =
     { employee -> sendEmail(composeMail(employee)) }
 
-fun createComposeMessageFrom(template: String): ComposeMessage = { e: Employee ->
+val composeMessage: ComposeMessage = { e: Employee ->
     EmailMessage(
         to = e.emailAddress,
         subject = "Birthday greetings",
-        body = template.format(e.firstName)
+        body = "Happy birthday %s!".format(e.firstName)
     )
 }
 
