@@ -29,7 +29,8 @@ suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
                 .drop(1)
                 .map(::CsvLine)
                 .let(::CsvFile)
-        })
+        }
+    )
 
 suspend fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
     csvLine.raw.split(",")
