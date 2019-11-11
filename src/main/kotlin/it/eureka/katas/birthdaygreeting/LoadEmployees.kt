@@ -35,8 +35,8 @@ fun <A> List<EitherT<ForIO, ProgramError, A>>.sequence(): EitherT<ForIO, Program
 fun readCsv(file: FileName): IO<Either<ProgramError, CsvFile>> =
     IO {
         object {}.javaClass.getResource(file.path).readText()
-    }.attempt().map {
-        it.bimap(
+    }.attempt().map { either ->
+        either.bimap(
             { ReadFileError(file.path) as ProgramError },
             { text ->
                 text.split("\n")
@@ -59,7 +59,7 @@ fun parseEmployee(csvLine: CsvLine): IO<Either<ProgramError, Employee>> =
                     birthDate = LocalDate.parse(csvLineCols[2], DateTimeFormatter.ofPattern("yyyy/MM/dd")),
                     emailAddress = EmailAddress(csvLineCols[3])
                 )
-            }.attempt().map { it.mapLeft { ParseError(csvLine.raw) } }
+            }.attempt().map { either -> either.mapLeft { ParseError(csvLine.raw) } }
         }
 
 data class FileName(val path: String)
