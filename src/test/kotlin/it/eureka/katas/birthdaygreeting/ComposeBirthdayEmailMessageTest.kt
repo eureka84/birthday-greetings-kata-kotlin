@@ -2,7 +2,7 @@ package it.eureka.katas.birthdaygreeting
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import java.time.LocalDate
 
 class ComposeBirthdayEmailMessageTest {

@@ -3,9 +3,9 @@ package it.eureka.katas.birthdaygreeting
 import assertk.assertThat
 import assertk.assertions.containsAll
 import assertk.assertions.isEmpty
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import org.subethamail.smtp.server.SMTPServer
 import java.time.LocalDate
 
@@ -35,12 +35,12 @@ class BirthdayKataTest {
         sendBirthDayGreetingMail
     )
 
-    @BeforeEach
+    @Before
     fun setUp() {
         server.start()
     }
 
-    @AfterEach
+    @After
     fun tearDown() {
         server.stop()
     }
