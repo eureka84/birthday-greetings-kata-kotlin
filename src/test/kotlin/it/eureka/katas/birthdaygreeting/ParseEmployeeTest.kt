@@ -12,7 +12,9 @@ class ParseEmployeeTest {
 
     @Test
     fun `read correct employee from CsvLine`() {
-        assertThat(parseEmployee(CsvLine("Doe, John, 1982/10/08, john.doe@foobar.com"))).isEqualTo(
+        assertThat(
+            parseEmployee(CsvLine("Doe, John, 1982/10/08, john.doe@foobar.com")).unsafeRunSync()
+        ).isEqualTo(
             Employee(
                 "Doe",
                 "John",
@@ -24,6 +26,8 @@ class ParseEmployeeTest {
 
     @Test
     fun `malformed csv line`() {
-        assertThat(parseEmployee(CsvLine("#comment"))).isEqualTo(ParseError("#comment").left())
+        assertThat(
+            parseEmployee(CsvLine("#comment")).unsafeRunSync()
+        ).isEqualTo(ParseError("#comment").left())
     }
 }

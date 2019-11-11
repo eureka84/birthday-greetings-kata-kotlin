@@ -47,7 +47,7 @@ class BirthdayKataTest {
 
     @Test
     fun `happy path`() {
-        sendGreetingsToAll(FileName("/fixtures/bigFile.csv"))
+        sendGreetingsToAll(FileName("/fixtures/bigFile.csv")).unsafeRunSync()
         assertThat(sentMessageListener.recipients).containsAll(
             "mary.ann@foobar.com",
             "caty.ann@foobar.com",
@@ -60,7 +60,7 @@ class BirthdayKataTest {
 
     @Test
     fun `csv file with errors`() {
-        sendGreetingsToAll(FileName("/fixtures/wrongFile.csv"))
+        sendGreetingsToAll(FileName("/fixtures/wrongFile.csv")).unsafeRunSync()
         assertThat(sentMessageListener.recipients).isEmpty()
     }
 

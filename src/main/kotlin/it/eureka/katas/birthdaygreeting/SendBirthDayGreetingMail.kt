@@ -2,8 +2,7 @@ package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
 import arrow.core.andThen
-import arrow.core.extensions.fx
-import arrow.fx.IO.Companion.effect
+import arrow.fx.IO
 import java.util.*
 import javax.mail.Message
 import javax.mail.Session
@@ -13,7 +12,7 @@ import javax.mail.internet.MimeMessage
 
 data class EmailMessage(val to: EmailAddress, val subject: String, val body: String)
 
-typealias SendEmail = (EmailMessage) -> Either<ProgramError, Unit>
+typealias SendEmail = (EmailMessage) -> IO<Either<ProgramError, Unit>>
 typealias ComposeMessage = (Employee) -> EmailMessage
 
 fun createSendBirthDayGreetingMail(composeMail: ComposeMessage, sendEmail: SendEmail): SendBirthdayGreetings =
@@ -29,20 +28,18 @@ val composeMessage: ComposeMessage = { e: Employee ->
 
 fun createSendEmailFrom(conf: MailServerConfiguration): SendEmail =
     { msg: EmailMessage ->
-         Either.fx {
-             !effect {
-                 Either.catch {
-                     val message = MimeMessage(conf.toSession())
+        IO {
+            val message = MimeMessage(conf.toSession())
 
-                     message.setFrom(InternetAddress("no-reply@myservice.com"))
-                     message.addRecipient(Message.RecipientType.TO, InternetAddress(msg.to.value))
-                     message.subject = msg.subject
-                     message.setText(msg.body)
+            message.setFrom(InternetAddress("no-reply@myservice.com"))
+            message.addRecipient(Message.RecipientType.TO, InternetAddress(msg.to.value))
+            message.subject = msg.subject
+            message.setText(msg.body)
 
-                     Transport.send(message)
-                 }.mapLeft { MailSendingError(msg) }
-             }.unsafeRunSync()
-         }
+            Transport.send(message)
+        }.attempt().map {
+            it.mapLeft { MailSendingError(msg) }
+        }
     }
 
 data class MailServerConfiguration(val host: String, val port: Int) {
