@@ -1,8 +1,9 @@
 package it.eureka.katas.birthdaygreeting
 
-import arrow.core.Either
-import arrow.core.andThen
-import arrow.fx.IO
+import it.msec.kio.IO
+import it.msec.kio.common.composition.andThen
+import it.msec.kio.mapError
+import it.msec.kio.unsafe
 import java.util.*
 import javax.mail.Message
 import javax.mail.Session
@@ -12,7 +13,7 @@ import javax.mail.internet.MimeMessage
 
 data class EmailMessage(val to: EmailAddress, val subject: String, val body: String)
 
-typealias SendEmail = (EmailMessage) -> IO<Either<ProgramError, Unit>>
+typealias SendEmail = (EmailMessage) -> IO<ProgramError, Unit>
 typealias ComposeMessage = (Employee) -> EmailMessage
 
 fun createSendBirthDayGreetingMail(composeMail: ComposeMessage, sendEmail: SendEmail): SendBirthdayGreetings =
@@ -28,7 +29,7 @@ val composeMessage: ComposeMessage = { e: Employee ->
 
 fun createSendEmailFrom(conf: MailServerConfiguration): SendEmail =
     { msg: EmailMessage ->
-        IO {
+        unsafe {
             val message = MimeMessage(conf.toSession())
 
             message.setFrom(InternetAddress("no-reply@myservice.com"))
@@ -37,9 +38,7 @@ fun createSendEmailFrom(conf: MailServerConfiguration): SendEmail =
             message.setText(msg.body)
 
             Transport.send(message)
-        }.attempt().map {
-            it.mapLeft { MailSendingError(msg) }
-        }
+        }.mapError { MailSendingError(msg) }
     }
 
 data class MailServerConfiguration(val host: String, val port: Int) {

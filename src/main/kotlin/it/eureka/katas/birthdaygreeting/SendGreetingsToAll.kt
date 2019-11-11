@@ -1,26 +1,24 @@
 package it.eureka.katas.birthdaygreeting
 
-import arrow.core.Either
-import arrow.fx.IO
-import arrow.fx.extensions.io.functor.functor
-import arrow.fx.extensions.io.monad.monad
-import arrow.fx.fix
-import arrow.mtl.EitherT
+import it.msec.kio.IO
+import it.msec.kio.common.list.sequence
+import it.msec.kio.flatMap
+import it.msec.kio.map
 
-typealias SendGreetings = (FileName) -> IO<Either<ProgramError, Unit>>
-typealias LoadEmployees = (FileName) -> IO<Either<ProgramError, List<Employee>>>
+typealias SendGreetings = (FileName) -> IO<ProgramError, Unit>
+typealias LoadEmployees = (FileName) -> IO<ProgramError, List<Employee>>
 typealias EmployeeFilter = (Employee) -> Boolean
-typealias SendBirthdayGreetings = (Employee) -> IO<Either<ProgramError, Unit>>
+typealias SendBirthdayGreetings = (Employee) -> IO<ProgramError, Unit>
 
 fun createSendGreetingsFunction(
     loadEmployees: LoadEmployees,
     employeeBornToday: EmployeeFilter,
     sendBirthDayGreetingMail: SendBirthdayGreetings
 ): SendGreetings = { sourceFile: FileName ->
-    EitherT(loadEmployees(sourceFile)).flatMap(IO.monad()) { employees ->
+    loadEmployees(sourceFile).flatMap { employees ->
         employees
             .filter(employeeBornToday)
-            .map { e -> EitherT(sendBirthDayGreetingMail(e)) }
-            .sequence().map(IO.functor()) { Unit }
-    }.value().fix()
+            .map { e -> sendBirthDayGreetingMail(e) }
+            .sequence().map{ Unit }
+    }
 }
