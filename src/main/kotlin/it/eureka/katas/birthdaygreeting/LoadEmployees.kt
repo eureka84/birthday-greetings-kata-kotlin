@@ -1,17 +1,10 @@
 package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.fix
-import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.extensions.io.applicative.applicative
-import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.fix
 import arrow.mtl.EitherT
-import arrow.mtl.extensions.eithert.applicative.applicative
-import arrow.mtl.fix
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -26,11 +19,6 @@ inline fun loadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee
                 .sequence()
         }.value().fix()
     }
-
-fun <A> List<EitherT<ForIO, ProgramError, A>>.sequence(): EitherT<ForIO, ProgramError, List<A>> {
-    val applicative = EitherT.applicative<ForIO, ProgramError>(IO.applicative())
-    return this.sequence(applicative).fix().map(IO.functor()) { it.fix() }
-}
 
 fun readCsv(file: FileName): IO<Either<ProgramError, CsvFile>> =
     IO {
