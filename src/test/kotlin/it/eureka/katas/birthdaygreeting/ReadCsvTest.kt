@@ -11,23 +11,18 @@ class ReadCsvTest {
 
     @Test
     fun `non existing file`() {
-        assertThat(
-            runBlocking { readCsv(FileName("/fixtures/a_non_existing_file")) }
-        ).isEqualTo(ReadFileError("/fixtures/a_non_existing_file").left())
+        assertThat(readCsv(FileName("/fixtures/a_non_existing_file")))
+            .isEqualTo(ReadFileError("/fixtures/a_non_existing_file").left())
     }
 
     @Test
     fun `empty file so empty csv`() {
-        assertThat(
-            runBlocking { readCsv(FileName("/fixtures/emptyFile.csv")) }
-        ).isEqualTo(CsvFile(listOf()).right())
+        assertThat(readCsv(FileName("/fixtures/emptyFile.csv"))).isEqualTo(CsvFile(listOf()).right())
     }
 
     @Test
     internal fun `filled csv`() {
-        assertThat(
-            runBlocking { readCsv(FileName("/fixtures/goodFile.csv")) }
-        ).isEqualTo(
+        assertThat(readCsv(FileName("/fixtures/goodFile.csv"))).isEqualTo(
             CsvFile(
                 listOf(
                     CsvLine("Doe, John, 1982/10/08, john.doe@foobar.com"),

@@ -2,12 +2,11 @@ package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
 import arrow.core.flatMap
-import kotlinx.coroutines.runBlocking
 
-typealias SendGreetings = suspend (FileName) -> Either<ProgramError, Unit>
-typealias LoadEmployees = suspend (FileName) -> Either<ProgramError, List<Employee>>
+typealias SendGreetings = (FileName) -> Either<ProgramError, Unit>
+typealias LoadEmployees = (FileName) -> Either<ProgramError, List<Employee>>
 typealias EmployeeFilter = (Employee) -> Boolean
-typealias SendBirthdayGreetings = suspend (Employee) -> Either<ProgramError, Unit>
+typealias SendBirthdayGreetings = (Employee) -> Either<ProgramError, Unit>
 
 fun createSendGreetingsFunction(
     loadEmployees: LoadEmployees,
@@ -17,7 +16,7 @@ fun createSendGreetingsFunction(
     loadEmployees(sourceFile).flatMap { employees ->
         employees
             .filter(employeeBornToday)
-            .map { employee -> runBlocking { sendBirthDayGreetingMail(employee) } }
+            .map(sendBirthDayGreetingMail)
             .sequence().map { Unit }
     }
 }
