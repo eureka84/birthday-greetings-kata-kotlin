@@ -2,8 +2,9 @@ package it.eureka.katas.birthdaygreeting
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import it.msec.kio.failure
-import it.msec.kio.just
+import it.msec.kio.result.Failure
+import it.msec.kio.result.Success
+import it.msec.kio.runtime.Runtime.unsafeRunSync
 import org.junit.Test
 
 class ReadCsvTest {
@@ -11,27 +12,27 @@ class ReadCsvTest {
     @Test
     fun `non existing file`() {
         assertThat(
-            readCsv(FileName("/fixtures/a_non_existing_file"))
+            unsafeRunSync(readCsv(FileName("/fixtures/a_non_existing_file")))
         ).isEqualTo(
-            failure(ReadFileError("/fixtures/a_non_existing_file"))
+            Failure(ReadFileError("/fixtures/a_non_existing_file"))
         )
     }
 
     @Test
     fun `empty file so empty csv`() {
         assertThat(
-            readCsv(FileName("/fixtures/emptyFile.csv"))
+            unsafeRunSync(readCsv(FileName("/fixtures/emptyFile.csv")))
         ).isEqualTo(
-            just(CsvFile(listOf()))
+            Success(CsvFile(listOf()))
         )
     }
 
     @Test
     internal fun `filled csv`() {
         assertThat(
-            readCsv(FileName("/fixtures/goodFile.csv"))
+            unsafeRunSync(readCsv(FileName("/fixtures/goodFile.csv")))
         ).isEqualTo(
-            just(
+            Success(
                 CsvFile(
                     listOf(
                         CsvLine("Doe, John, 1982/10/08, john.doe@foobar.com"),
