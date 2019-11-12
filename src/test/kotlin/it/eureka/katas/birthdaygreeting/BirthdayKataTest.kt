@@ -26,7 +26,7 @@ class BirthdayKataTest {
             )
         )
     )
-    private val loadEmployees = loadEmployees(::readCsv, ::parseEmployee)
+    private val loadEmployees = createLoadEmployees(::readCsv, ::parseEmployee)
     private val employeeBornToday = createEmployeeBirthdayFilterFor(today)
 
     private val sendGreetingsToAll: SendGreetings = createSendGreetingsFunction(

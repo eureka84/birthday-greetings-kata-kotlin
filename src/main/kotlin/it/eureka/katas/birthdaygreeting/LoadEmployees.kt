@@ -15,7 +15,7 @@ data class CsvLine(val raw: String)
 typealias ReadCsv = (FileName) -> IO<Either<ProgramError, CsvFile>>
 typealias ParseEmployee = (CsvLine) -> IO<Either<ProgramError, Employee>>
 
-inline fun loadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
+inline fun createLoadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
     { sourceFile: FileName ->
         EitherT(readCsv(sourceFile)).flatMap(IO.monad()) { file: CsvFile ->
             file.rows
