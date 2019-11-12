@@ -28,7 +28,7 @@ fun readCsv(file: FileName): IO<Either<ProgramError, CsvFile>> =
         object {}.javaClass.getResource(file.path).readText()
     }.attempt().map { either ->
         either.bimap(
-            { ReadFileError(file.path) as ProgramError },
+            { ReadFileError(file.path) },
             { text ->
                 text.split("\n")
                     .drop(1)
