@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 typealias ReadCsv = (FileName) -> IO<ProgramError, CsvFile>
 typealias ParseEmployee = (CsvLine) -> IO<ProgramError, Employee>
 
-inline fun loadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
+inline fun createLoadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
     { sourceFile: FileName ->
         readCsv(sourceFile).flatMap { file: CsvFile ->
             file.rows
