@@ -11,8 +11,8 @@ import arrow.mtl.EitherT
 import arrow.mtl.extensions.eithert.applicative.applicative
 import arrow.mtl.fix
 
-fun <A> List<EitherT<ForIO, ProgramError, A>>.sequence(): EitherT<ForIO, ProgramError, List<A>> {
-    val applicative = EitherT.applicative<ForIO, ProgramError>(IO.applicative())
+fun <E, A> List<EitherT<ForIO, E, A>>.sequence(): EitherT<ForIO, E, List<A>> {
+    val applicative = EitherT.applicative<ForIO, E>(IO.applicative())
     return this.sequence(applicative).fix().map(IO.functor()) { it.fix() }
 }
 
