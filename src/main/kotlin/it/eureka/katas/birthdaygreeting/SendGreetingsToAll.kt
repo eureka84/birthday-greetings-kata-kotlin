@@ -18,7 +18,7 @@ fun createSendGreetingsFunction(
     loadEmployees(sourceFile).flatMap { employees ->
         employees
             .filter(employeeBornToday)
-            .map { e -> sendBirthDayGreetingMail(e) }
+            .map(sendBirthDayGreetingMail)
             .sequence().map{ Unit }
     }
 }
