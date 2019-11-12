@@ -8,6 +8,10 @@ import arrow.mtl.EitherT
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+data class FileName(val path: String)
+data class CsvFile(val rows: List<CsvLine>)
+data class CsvLine(val raw: String)
+
 typealias ReadCsv = (FileName) -> IO<Either<ProgramError, CsvFile>>
 typealias ParseEmployee = (CsvLine) -> IO<Either<ProgramError, Employee>>
 
@@ -49,7 +53,3 @@ fun parseEmployee(csvLine: CsvLine): IO<Either<ProgramError, Employee>> =
                 )
             }.attempt().map { either -> either.mapLeft { ParseError(csvLine.raw) } }
         }
-
-data class FileName(val path: String)
-data class CsvFile(val rows: List<CsvLine>)
-data class CsvLine(val raw: String)
