@@ -21,7 +21,7 @@ fun readCsv(file: FileName): IO<ProgramError, CsvFile> =
     unsafe {
         object {}.javaClass.getResource(file.path).readText()
     }.bimap(
-        { ReadFileError(file.path) as ProgramError },
+        { ReadFileError(file.path) },
         { text ->
             text.split("\n")
                 .drop(1)
