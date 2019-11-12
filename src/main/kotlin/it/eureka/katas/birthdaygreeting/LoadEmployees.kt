@@ -2,7 +2,6 @@ package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
 import arrow.fx.IO
-import arrow.fx.extensions.io.monad.monad
 import arrow.fx.fix
 import arrow.mtl.EitherT
 import java.time.LocalDate
@@ -17,7 +16,7 @@ typealias ParseEmployee = (CsvLine) -> IO<Either<ProgramError, Employee>>
 
 inline fun createLoadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
     { sourceFile: FileName ->
-        EitherT(readCsv(sourceFile)).flatMap(IO.monad()) { file: CsvFile ->
+        EitherT(readCsv(sourceFile)).flatMap { file: CsvFile ->
             file.rows
                 .map { r -> EitherT(parseEmployee(r)) }
                 .sequence()
