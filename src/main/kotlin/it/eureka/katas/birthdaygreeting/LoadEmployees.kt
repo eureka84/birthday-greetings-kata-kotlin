@@ -25,17 +25,15 @@ inline fun createLoadEmployees(crossinline readCsv: ReadCsv, crossinline parseEm
 
 fun readCsv(file: FileName): IO<Either<ProgramError, CsvFile>> =
     IO {
-        object {}.javaClass.getResource(file.path).readText()
-    }.attempt().map { either ->
-        either.bimap(
-            { ReadFileError(file.path) },
-            { text ->
-                text.split("\n")
-                    .drop(1)
-                    .map(::CsvLine)
-                    .let(::CsvFile)
-            }
-        )
+        Either.catch {
+            object {}.javaClass
+                .getResource(file.path)
+                .readText()
+                .split("\n")
+                .drop(1)
+                .map(::CsvLine)
+                .let(::CsvFile)
+        }.mapLeft { ReadFileError(file.path) }
     }
 
 
@@ -44,11 +42,12 @@ fun parseEmployee(csvLine: CsvLine): IO<Either<ProgramError, Employee>> =
         .map { it.trim() }
         .let { csvLineCols ->
             IO {
-                Employee(
-                    lastName = csvLineCols[0],
-                    firstName = csvLineCols[1],
-                    birthDate = LocalDate.parse(csvLineCols[2], DateTimeFormatter.ofPattern("yyyy/MM/dd")),
-                    emailAddress = EmailAddress(csvLineCols[3])
-                )
-            }.attempt().map { either -> either.mapLeft { ParseError(csvLine.raw) } }
+                Either.catch {
+                    Employee(
+                        lastName = csvLineCols[0],
+                        firstName = csvLineCols[1],
+                        birthDate = LocalDate.parse(csvLineCols[2], DateTimeFormatter.ofPattern("yyyy/MM/dd")),
+                        emailAddress = EmailAddress(csvLineCols[3])
+                    )
+                }.mapLeft { ParseError(csvLine.raw) } }
         }

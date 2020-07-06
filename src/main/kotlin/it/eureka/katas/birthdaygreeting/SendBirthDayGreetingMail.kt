@@ -29,16 +29,16 @@ val composeMessage: ComposeMessage = { e: Employee ->
 fun createSendEmailFrom(conf: MailServerConfiguration): SendEmail =
     { msg: EmailMessage ->
         IO {
-            val message = MimeMessage(conf.toSession())
+            Either.catch {
+                val message = MimeMessage(conf.toSession())
 
-            message.setFrom(InternetAddress("no-reply@myservice.com"))
-            message.addRecipient(Message.RecipientType.TO, InternetAddress(msg.to.value))
-            message.subject = msg.subject
-            message.setText(msg.body)
+                message.setFrom(InternetAddress("no-reply@myservice.com"))
+                message.addRecipient(Message.RecipientType.TO, InternetAddress(msg.to.value))
+                message.subject = msg.subject
+                message.setText(msg.body)
 
-            Transport.send(message)
-        }.attempt().map {
-            it.mapLeft { MailSendingError(msg) }
+                Transport.send(message)
+            }.mapLeft {  MailSendingError(msg) }
         }
     }
 
