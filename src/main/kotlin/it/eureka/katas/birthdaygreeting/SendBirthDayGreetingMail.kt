@@ -13,8 +13,8 @@ data class EmailMessage(val to: EmailAddress, val subject: String, val body: Str
 typealias SendEmail = suspend (EmailMessage) -> Either<ProgramError, Unit>
 typealias ComposeMessage = (Employee) -> EmailMessage
 
-fun createSendBirthDayGreetingMail(composeMail: ComposeMessage, sendEmail: SendEmail): SendBirthdayGreetings =
-    composeMail andThen sendEmail
+fun createSendBirthDayGreetingMail(composeMessage: ComposeMessage, sendEmail: SendEmail): SendBirthdayGreetings =
+    composeMessage andThen sendEmail
 
 val composeMessage: ComposeMessage = { e: Employee ->
     EmailMessage(
