@@ -17,7 +17,9 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertTrue(createEmployeeBirthdayFilterFor(today)(employee))
+        val isBornToday = createEmployeeBirthdayFilterFor(today)
+
+        assertTrue(isBornToday(employee))
     }
 
     @Test
@@ -30,7 +32,9 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertFalse(createEmployeeBirthdayFilterFor(today)(employee))
+        val isBorneToday = createEmployeeBirthdayFilterFor(today)
+
+        assertFalse(isBorneToday(employee))
     }
 
 
@@ -44,7 +48,9 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertTrue(createEmployeeBirthdayFilterFor(today)(employee))
+        val isBorneToday = createEmployeeBirthdayFilterFor(today)
+
+        assertTrue(isBorneToday(employee))
     }
 
     @Test
@@ -57,7 +63,9 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertTrue(createEmployeeBirthdayFilterFor(today)(employee))
+        val isBorneToday = createEmployeeBirthdayFilterFor(today)
+
+        assertTrue(isBorneToday(employee))
     }
 
     @Test
@@ -70,7 +78,9 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertFalse(createEmployeeBirthdayFilterFor(today)(employee))
+        val isBorneToday = createEmployeeBirthdayFilterFor(today)
+
+        assertFalse(isBorneToday(employee))
     }
 
     @Test
@@ -83,7 +93,9 @@ class EmployeeBirthdayFilterTest {
             EmailAddress("john@email.com")
         )
 
-        assertFalse(createEmployeeBirthdayFilterFor(today)(employee))
+        val isBorneToday = createEmployeeBirthdayFilterFor(today)
+
+        assertFalse(isBorneToday(employee))
     }
 
 }
