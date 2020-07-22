@@ -1,7 +1,7 @@
 package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
-import arrow.core.either
+import arrow.core.flatMap
 
 typealias LoadEmployees = suspend (FileName) -> Either<ProgramError, List<Employee>>
 typealias EmployeeFilter = (Employee) -> Boolean
@@ -13,8 +13,7 @@ fun createSendGreetingsFunction(
     employeeBornToday: EmployeeFilter,
     sendBirthDayGreetingMail: SendBirthdayGreetings
 ): SendGreetings = { sourceFile: FileName ->
-    either {
-        val employees = !loadEmployees(sourceFile)
+    loadEmployees(sourceFile).flatMap { employees ->
         employees
             .filter(employeeBornToday)
             .map { e -> sendBirthDayGreetingMail(e) }

@@ -1,7 +1,7 @@
 package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
-import arrow.core.either
+import arrow.core.flatMap
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -14,9 +14,8 @@ typealias ParseEmployee = suspend (CsvLine) -> Either<ProgramError, Employee>
 
 inline fun createLoadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
     { sourceFile: FileName ->
-        either {
-            val file: CsvFile = !readCsv(sourceFile)
-            !file.rows
+        readCsv(sourceFile).flatMap { file ->
+            file.rows
                 .map { r -> parseEmployee(r) }
                 .sequence()
         }
