@@ -14,7 +14,7 @@ typealias SendEmail = suspend (EmailMessage) -> Either<ProgramError, Unit>
 typealias ComposeMessage = (Employee) -> EmailMessage
 
 fun createSendBirthDayGreetingMail(composeMail: ComposeMessage, sendEmail: SendEmail): SendBirthdayGreetings =
-    { employee -> sendEmail(composeMail(employee)) }
+    composeMail andThen sendEmail
 
 val composeMessage: ComposeMessage = { e: Employee ->
     EmailMessage(
