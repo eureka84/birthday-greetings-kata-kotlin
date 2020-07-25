@@ -79,6 +79,11 @@
             <version>0.20</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-fx-coroutines</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

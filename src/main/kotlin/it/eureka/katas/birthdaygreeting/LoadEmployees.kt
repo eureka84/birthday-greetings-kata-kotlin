@@ -2,6 +2,8 @@ package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.fx.coroutines.Resource
+import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -23,13 +25,17 @@ inline fun createLoadEmployees(crossinline readCsv: ReadCsv, crossinline parseEm
 
 suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
     Either.catch {
-        object {}.javaClass
-            .getResource(file.path)
-            .readText()
-            .split("\n")
-            .drop(1)
-            .map(::CsvLine)
-            .let(::CsvFile)
+        Resource(
+            acquire = { object {}.javaClass.getResource(file.path).openStream() },
+            release = { r: InputStream -> r.close() }
+        ).use { inputStream ->
+                inputStream
+                    .reader()
+                    .readLines()
+                    .drop(1)
+                    .map(::CsvLine)
+                    .let(::CsvFile)
+        }
     }.mapLeft { ReadFileError(file.path) }
 
 suspend fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
