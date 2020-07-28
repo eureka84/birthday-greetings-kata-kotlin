@@ -1,9 +1,9 @@
 package it.eureka.katas.birthdaygreeting
 
+import arrow.fx.coroutines.Environment
 import assertk.assertThat
 import assertk.assertions.containsAll
 import assertk.assertions.isEmpty
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -48,7 +48,7 @@ class BirthdayKataTest {
 
     @Test
     fun `happy path`() {
-        runBlocking {
+        Environment().unsafeRunSync {
             sendGreetingsToAll(FileName("/fixtures/bigFile.csv"))
             assertThat(sentMessageListener.recipients).containsAll(
                 "mary.ann@foobar.com",
@@ -63,7 +63,7 @@ class BirthdayKataTest {
 
     @Test
     fun `csv file with errors`() {
-        runBlocking {
+        Environment().unsafeRunSync {
             sendGreetingsToAll(FileName("/fixtures/wrongFile.csv"))
             assertThat(sentMessageListener.recipients).isEmpty()
         }
