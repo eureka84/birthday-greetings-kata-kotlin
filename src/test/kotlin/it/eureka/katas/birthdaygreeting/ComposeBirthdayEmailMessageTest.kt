@@ -9,7 +9,12 @@ class ComposeBirthdayEmailMessageTest {
 
     @Test
     fun `build employee birthday message`() {
-        val employee = Employee("Doe", "John", LocalDate.of(1980, 2, 29), EmailAddress("john.doe@email.com"))
+        val employee = Employee(
+            "Doe",
+            "John",
+            LocalDate.of(1980, 2, 29),
+            EmailAddress("john.doe@email.com")
+        )
 
         assertThat(composeMessage(employee)).isEqualTo(
             EmailMessage(
