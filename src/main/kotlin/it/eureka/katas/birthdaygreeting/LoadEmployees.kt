@@ -1,7 +1,7 @@
 package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
-import arrow.core.flatMap
+import arrow.core.computations.either
 import arrow.fx.coroutines.Resource
 import java.io.InputStream
 import java.time.LocalDate
@@ -14,14 +14,18 @@ data class CsvLine(val raw: String)
 typealias ReadCsv = suspend (FileName) -> Either<ProgramError, CsvFile>
 typealias ParseEmployee = suspend (CsvLine) -> Either<ProgramError, Employee>
 
-inline fun createLoadEmployees(crossinline readCsv: ReadCsv, crossinline parseEmployee: ParseEmployee): LoadEmployees =
-    { sourceFile: FileName ->
-        readCsv(sourceFile).flatMap { file ->
-            file.rows
-                .map { r -> parseEmployee(r) }
-                .sequence()
-        }
+inline fun createLoadEmployees(
+    crossinline readCsv: ReadCsv,
+    crossinline parseEmployee: ParseEmployee
+): LoadEmployees = { sourceFile: FileName ->
+    either {
+        val file: CsvFile = readCsv(sourceFile).bind()
+        file.rows
+            .map { r -> parseEmployee(r) }
+            .sequence()
+            .bind()
     }
+}
 
 suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
     Either.catch {
@@ -29,12 +33,10 @@ suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
             acquire = { object {}.javaClass.getResource(file.path).openStream() },
             release = { r: InputStream -> r.close() }
         ).use { inputStream ->
-                inputStream
-                    .reader()
-                    .readLines()
-                    .drop(1)
-                    .map(::CsvLine)
-                    .let(::CsvFile)
+            inputStream.reader().readLines()
+                .drop(1)
+                .map(::CsvLine)
+                .let(::CsvFile)
         }
     }.mapLeft { ReadFileError(file.path) }
 

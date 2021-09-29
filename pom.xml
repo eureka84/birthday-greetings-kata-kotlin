@@ -81,6 +81,11 @@
             <version>0.20</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.5.0</version>
+        </dependency>
     </dependencies>
 
     <build>
