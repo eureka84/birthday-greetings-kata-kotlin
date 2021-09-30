@@ -5,6 +5,7 @@ import arrow.core.computations.either
 import arrow.core.flatMap
 import arrow.core.right
 import arrow.fx.coroutines.Resource
+import arrow.fx.coroutines.bracket
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -37,15 +38,16 @@ fun <L, R> List<Either<L, R>>.sequence(): Either<L, List<R>> {
 
 suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
     Either.catch {
-        Resource(
+        bracket(
             acquire = { object {}.javaClass.getResource(file.path).openStream() },
+            use = { inputStream ->
+                inputStream.reader().readLines()
+                    .drop(1)
+                    .map(::CsvLine)
+                    .let(::CsvFile)
+            },
             release = { r: InputStream -> r.close() }
-        ).use { inputStream ->
-            inputStream.reader().readLines()
-                .drop(1)
-                .map(::CsvLine)
-                .let(::CsvFile)
-        }
+        )
     }.mapLeft { ReadFileError(file.path) }
 
 suspend fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
