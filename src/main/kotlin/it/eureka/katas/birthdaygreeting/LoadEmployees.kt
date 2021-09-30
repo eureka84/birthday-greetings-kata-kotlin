@@ -2,9 +2,7 @@ package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
 import arrow.core.computations.either
-import arrow.core.flatMap
-import arrow.core.right
-import arrow.fx.coroutines.Resource
+import arrow.core.sequenceEither
 import arrow.fx.coroutines.bracket
 import java.io.InputStream
 import java.time.LocalDate
@@ -25,14 +23,8 @@ inline fun createLoadEmployees(
         val file: CsvFile = readCsv(sourceFile).bind()
         file.rows
             .map { r -> parseEmployee(r) }
-            .sequence()
+            .sequenceEither()
             .bind()
-    }
-}
-
-fun <L, R> List<Either<L, R>>.sequence(): Either<L, List<R>> {
-    return this.fold(listOf<R>().right() as Either<L, List<R>>) { acc, either ->
-        acc.flatMap { l -> either.map { el -> l + el } }
     }
 }
 
