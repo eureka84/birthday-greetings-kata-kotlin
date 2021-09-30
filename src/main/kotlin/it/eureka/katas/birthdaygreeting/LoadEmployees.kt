@@ -2,6 +2,8 @@ package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
 import arrow.core.computations.either
+import arrow.core.flatMap
+import arrow.core.right
 import arrow.fx.coroutines.Resource
 import java.io.InputStream
 import java.time.LocalDate
@@ -27,6 +29,12 @@ inline fun createLoadEmployees(
     }
 }
 
+fun <L, R> List<Either<L, R>>.sequence(): Either<L, List<R>> {
+    return this.fold(listOf<R>().right() as Either<L, List<R>>) { acc, either ->
+        acc.flatMap { l -> either.map { el -> l + el } }
+    }
+}
+
 suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
     Either.catch {
         Resource(
@@ -48,7 +56,10 @@ suspend fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
                 Employee(
                     lastName = csvLineCols[0],
                     firstName = csvLineCols[1],
-                    birthDate = LocalDate.parse(csvLineCols[2], DateTimeFormatter.ofPattern("yyyy/MM/dd")),
+                    birthDate = LocalDate.parse(
+                        csvLineCols[2],
+                        DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                    ),
                     emailAddress = EmailAddress(csvLineCols[3])
                 )
             }.mapLeft { ParseError(csvLine.raw) }

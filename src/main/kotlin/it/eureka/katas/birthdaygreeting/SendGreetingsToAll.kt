@@ -31,6 +31,6 @@ private suspend fun List<Either<ProgramError, Unit>>.report() {
         val list: List<Either.Left<ProgramError>> =
             self.filter { it.isLeft() }
                 .map { it as Either.Left<ProgramError> }
-        list.forEach { error -> launch { println(error.a) } }
+        list.forEach { error -> launch { println(error.value) } }
     }
 }

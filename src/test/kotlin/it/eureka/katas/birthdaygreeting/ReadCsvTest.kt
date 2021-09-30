@@ -2,16 +2,16 @@ package it.eureka.katas.birthdaygreeting
 
 import arrow.core.left
 import arrow.core.right
-import arrow.fx.coroutines.Environment
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 class ReadCsvTest {
 
     @Test
     fun `non existing file`() {
-        Environment().unsafeRunSync {
+        runBlocking {
             assertThat(readCsv(FileName("/fixtures/a_non_existing_file")))
                 .isEqualTo(ReadFileError("/fixtures/a_non_existing_file").left())
         }
@@ -19,7 +19,7 @@ class ReadCsvTest {
 
     @Test
     fun `empty file so empty csv`() {
-        Environment().unsafeRunSync {
+        runBlocking {
             assertThat(readCsv(FileName("/fixtures/emptyFile.csv")))
                 .isEqualTo(CsvFile(listOf()).right())
         }
@@ -27,7 +27,7 @@ class ReadCsvTest {
 
     @Test
     fun `filled csv`() {
-        Environment().unsafeRunSync {
+        runBlocking {
             assertThat(readCsv(FileName("/fixtures/goodFile.csv")))
                 .isEqualTo(
                     CsvFile(
