@@ -8,9 +8,9 @@ import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-data class FileName(val path: String)
+@JvmInline value class FileName(val path: String)
 data class CsvFile(val rows: List<CsvLine>)
-data class CsvLine(val raw: String)
+@JvmInline value class CsvLine(val raw: String)
 
 typealias ReadCsv = suspend (FileName) -> Either<ProgramError, CsvFile>
 typealias ParseEmployee = suspend (CsvLine) -> Either<ProgramError, Employee>

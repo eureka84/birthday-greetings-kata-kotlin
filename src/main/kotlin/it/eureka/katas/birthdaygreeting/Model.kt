@@ -9,7 +9,8 @@ data class Employee(
     val emailAddress: EmailAddress
 )
 
-data class EmailAddress(val value: String)
+@JvmInline
+value class EmailAddress(val value: String)
 
 sealed class ProgramError
 data class ReadFileError(val path: String) : ProgramError()
