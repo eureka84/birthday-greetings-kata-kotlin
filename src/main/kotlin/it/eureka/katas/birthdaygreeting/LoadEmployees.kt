@@ -42,7 +42,7 @@ suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
         )
     }.mapLeft { ReadFileError(file.path) }
 
-suspend fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
+fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
     csvLine.raw.split(",")
         .map { it.trim() }
         .let { csvLineCols ->
