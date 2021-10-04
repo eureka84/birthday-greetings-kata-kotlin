@@ -2,7 +2,6 @@ package it.eureka.katas.birthdaygreeting
 
 import arrow.core.Either
 import arrow.core.computations.either
-import arrow.core.sequenceEither
 import arrow.fx.coroutines.bracket
 import java.io.InputStream
 import java.time.LocalDate
@@ -13,7 +12,8 @@ data class CsvFile(val rows: List<CsvLine>)
 @JvmInline value class CsvLine(val raw: String)
 
 typealias ReadCsv = suspend (FileName) -> Either<ProgramError, CsvFile>
-typealias ParseEmployee = suspend (CsvLine) -> Either<ProgramError, Employee>
+typealias ParseEmployee = suspend (CsvLine) -> ParseResult
+typealias LoadEmployees = suspend (FileName) -> Either<ProgramError, List<ParseResult>>
 
 inline fun createLoadEmployees(
     crossinline readCsv: ReadCsv,
@@ -23,8 +23,6 @@ inline fun createLoadEmployees(
         val file: CsvFile = readCsv(sourceFile).bind()
         file.rows
             .map { r -> parseEmployee(r) }
-            .sequenceEither()
-            .bind()
     }
 }
 
@@ -42,7 +40,7 @@ suspend fun readCsv(file: FileName): Either<ProgramError, CsvFile> =
         )
     }.mapLeft { ReadFileError(file.path) }
 
-fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
+fun parseEmployee(csvLine: CsvLine): ParseResult =
     csvLine.raw.split(",")
         .map { it.trim() }
         .let { csvLineCols ->
@@ -56,6 +54,9 @@ fun parseEmployee(csvLine: CsvLine): Either<ProgramError, Employee> =
                     ),
                     emailAddress = EmailAddress(csvLineCols[3])
                 )
-            }.mapLeft { ParseError(csvLine.raw) }
+            }.fold (
+                { error ->  ParseError(csvLine.raw, error::class.java.name) },
+                { it }
+            )
         }
 

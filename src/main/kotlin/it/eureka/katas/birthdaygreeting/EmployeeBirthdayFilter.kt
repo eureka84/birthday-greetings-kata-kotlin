@@ -4,6 +4,8 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.Month.FEBRUARY
 
+typealias EmployeeFilter = (Employee) -> Boolean
+
 fun createEmployeeBirthdayFilterFor(today: LocalDate): EmployeeFilter = { e: Employee ->
     when {
         e.isBornOn(FEBRUARY, 29) && today.isLeapYear -> today.`is`(FEBRUARY, 29)

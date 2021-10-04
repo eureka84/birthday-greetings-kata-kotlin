@@ -1,36 +1,37 @@
 package it.eureka.katas.birthdaygreeting
 
-import arrow.core.Either
 import arrow.core.computations.either
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
-typealias LoadEmployees = suspend (FileName) -> Either<ProgramError, List<Employee>>
-typealias EmployeeFilter = (Employee) -> Boolean
-typealias SendBirthdayGreetings = suspend (Employee) -> Either<ProgramError, Unit>
-typealias SendGreetings = suspend (FileName) -> Either<ProgramError, Unit>
+typealias SendGreetings = suspend (FileName) -> List<Result>
 
 fun createSendGreetingsFunction(
     loadEmployees: LoadEmployees,
     employeeBornToday: EmployeeFilter,
     sendBirthDayGreetingMail: SendBirthdayGreetings
 ): SendGreetings = { sourceFile: FileName ->
-    either {
-        val employees: List<Employee> = loadEmployees(sourceFile).bind()
-        val results: List<Either<ProgramError, Unit>> =
+    either<ProgramError, List<Result>> {
+        val parseResults: List<ParseResult> = loadEmployees(sourceFile).bind()
+        val (employees, parseErrors) = parseResults.partition { parseResult -> parseResult is Employee }
+        val results: List<Result> =
             employees
+                .map { it as Employee }
                 .filter(employeeBornToday)
                 .map { e -> sendBirthDayGreetingMail(e) }
-       results.report()
-    }
+        val overAllResults: List<Result> = results + parseErrors.map { (it as ParseError).toResult() }
+        overAllResults.also { it.report() }
+    }.fold(
+        { listOf(it)},
+        { it }
+    )
 }
 
-private suspend fun List<Either<ProgramError, Unit>>.report() {
-    val self = this
-    coroutineScope {
-        val list: List<Either.Left<ProgramError>> =
-            self.filter { it.isLeft() }
-                .map { it as Either.Left<ProgramError> }
-        list.forEach { error -> launch { println(error.value) } }
+private fun List<Result>.report() {
+    this.forEach { r ->
+        when(r) {
+            is Sent -> println("Greetings sent to ${r.message.to}")
+            is SendingError -> println("Failed to send greetings to ${r.emailMessage.to}")
+            is ParseEmployeeError -> println("Failed to parse employee ${r.source}: ${r.cause}")
+            is ReadFileError -> println("Failed to read file ${r.path}")
+        }
     }
 }

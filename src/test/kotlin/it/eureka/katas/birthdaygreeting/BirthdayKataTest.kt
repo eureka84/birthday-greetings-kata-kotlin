@@ -65,7 +65,7 @@ class BirthdayKataTest {
     fun `csv file with errors`() {
         runBlocking {
             sendGreetingsToAll(FileName("/fixtures/wrongFile.csv"))
-            assertThat(sentMessageListener.recipients).isEmpty()
+            assertThat(sentMessageListener.recipients).containsAll("john.doe@foobar.com")
         }
     }
 

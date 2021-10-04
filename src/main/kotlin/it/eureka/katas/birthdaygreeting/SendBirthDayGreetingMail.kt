@@ -10,8 +10,10 @@ import javax.mail.internet.MimeMessage
 
 data class EmailMessage(val to: EmailAddress, val subject: String, val body: String)
 
-typealias SendEmail = suspend (EmailMessage) -> Either<ProgramError, Unit>
 typealias ComposeMessage = (Employee) -> EmailMessage
+typealias SendEmail = suspend (EmailMessage) -> GreetingMail
+
+typealias SendBirthdayGreetings = suspend (Employee) -> GreetingMail
 
 fun createSendBirthDayGreetingMail(
     composeMessage: ComposeMessage,
@@ -37,7 +39,10 @@ fun createSendEmailFrom(conf: MailServerConfiguration): SendEmail =
             message.setText(msg.body)
 
             Transport.send(message)
-        }.mapLeft { MailSendingError(msg) }
+        }.fold(
+            { SendingError(msg) },
+            { Sent(msg) }
+        )
     }
 
 data class MailServerConfiguration(val host: String, val port: Int) {
